@@ -1,0 +1,123 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: chatos-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: chatos
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-chatos_secure_2024}
+      POSTGRES_DB: chatos_trading
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chatos -d chatos_trading"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: chatos-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  scraper-aggr:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.scraper
+    container_name: chatos-scraper-aggr
+    restart: unless-stopped
+    environment:
+      - SCRAPER_TYPE=aggr
+      - OUTPUT_DIR=/data/aggr
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_URL=postgresql://chatos:${POSTGRES_PASSWORD:-chatos_secure_2024}@postgres:5432/chatos_trading
+      - SYMBOLS=BTC,ETH,SOL
+    volumes:
+      - scraped_data:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  scraper-coinglass:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.scraper
+    container_name: chatos-scraper-coinglass
+    restart: unless-stopped
+    environment:
+      - SCRAPER_TYPE=coinglass
+      - OUTPUT_DIR=/data/coinglass
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_URL=postgresql://chatos:${POSTGRES_PASSWORD:-chatos_secure_2024}@postgres:5432/chatos_trading
+      - SYMBOLS=BTC,ETH,SOL
+      - INTERVAL_SECONDS=60
+    volumes:
+      - scraped_data:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  scraper-market:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.scraper
+    container_name: chatos-scraper-market
+    restart: unless-stopped
+    environment:
+      - SCRAPER_TYPE=market
+      - OUTPUT_DIR=/data/market
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_URL=postgresql://chatos:${POSTGRES_PASSWORD:-chatos_secure_2024}@postgres:5432/chatos_trading
+      - SYMBOLS=BTCUSDT,ETHUSDT,SOLUSDT
+    volumes:
+      - scraped_data:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  data-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    container_name: chatos-data-api
+    restart: unless-stopped
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_URL=postgresql://chatos:${POSTGRES_PASSWORD:-chatos_secure_2024}@postgres:5432/chatos_trading
+      - DATA_DIR=/data
+      - API_KEY=${API_KEY:-chatos_api_key_change_me}
+    volumes:
+      - scraped_data:/data:ro
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
+  scraped_data:

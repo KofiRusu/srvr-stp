@@ -1,0 +1,17 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY server-setup/requirements-scraper.txt .
+RUN pip install --no-cache-dir -r requirements-scraper.txt
+
+COPY ChatOS-v2.2/scrapers/ ./scrapers/
+COPY server-setup/scripts/run_scraper.py .
+
+ENV PYTHONUNBUFFERED=1
+
+CMD ["python", "run_scraper.py"]
