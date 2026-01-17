@@ -1,0 +1,4 @@
+pytrends>=4.9.0
+httpx>=0.25.0
+asyncpg>=0.29.0
+redis>=5.0.0

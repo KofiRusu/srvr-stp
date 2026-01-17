@@ -94,6 +94,131 @@ services:
       redis:
         condition: service_healthy
 
+  scraper-crypto-metrics:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.crypto-metrics
+    container_name: chatos-scraper-crypto-metrics
+    restart: unless-stopped
+    environment:
+      - COINMARKETCAP_API_KEY=${COINMARKETCAP_API_KEY:-}
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_URL=postgresql://chatos:${POSTGRES_PASSWORD:-chatos_secure_2024}@postgres:5432/chatos_trading
+    volumes:
+      - scraped_data:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  scraper-coingecko:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.coingecko
+    container_name: chatos-scraper-coingecko
+    restart: unless-stopped
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_URL=postgresql://chatos:${POSTGRES_PASSWORD:-chatos_secure_2024}@postgres:5432/chatos_trading
+    volumes:
+      - scraped_data:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  scraper-ccxt:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.ccxt
+    container_name: chatos-scraper-ccxt
+    restart: unless-stopped
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_URL=postgresql://chatos:${POSTGRES_PASSWORD:-chatos_secure_2024}@postgres:5432/chatos_trading
+    volumes:
+      - scraped_data:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  scraper-tradingview:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.tradingview
+    container_name: chatos-scraper-tradingview
+    restart: unless-stopped
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_URL=postgresql://chatos:${POSTGRES_PASSWORD:-chatos_secure_2024}@postgres:5432/chatos_trading
+    volumes:
+      - scraped_data:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  scraper-news:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.news
+    container_name: chatos-scraper-news
+    restart: unless-stopped
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_URL=postgresql://chatos:${POSTGRES_PASSWORD:-chatos_secure_2024}@postgres:5432/chatos_trading
+    volumes:
+      - scraped_data:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  scraper-social:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.social
+    container_name: chatos-scraper-social
+    restart: unless-stopped
+    environment:
+      - TWITTER_BEARER_TOKEN=${TWITTER_BEARER_TOKEN:-}
+      - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID:-}
+      - REDDIT_CLIENT_SECRET=${REDDIT_CLIENT_SECRET:-}
+      - REDDIT_USER_AGENT=ChatOS-Scraper/1.0
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY:-}
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_URL=postgresql://chatos:${POSTGRES_PASSWORD:-chatos_secure_2024}@postgres:5432/chatos_trading
+    volumes:
+      - scraped_data:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  scraper-sentiment:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.sentiment
+    container_name: chatos-scraper-sentiment
+    restart: unless-stopped
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_URL=postgresql://chatos:${POSTGRES_PASSWORD:-chatos_secure_2024}@postgres:5432/chatos_trading
+    volumes:
+      - scraped_data:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   data-api:
     build:
       context: ../
