@@ -6,10 +6,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY server-setup/requirements-api.txt .
+COPY requirements-api.txt ./
 RUN pip install --no-cache-dir -r requirements-api.txt
 
-COPY server-setup/scripts/data_api.py .
+COPY scripts/data_api.py ./
 
 ENV PYTHONUNBUFFERED=1
 

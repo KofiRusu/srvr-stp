@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -37,7 +35,7 @@ services:
 
   scraper-aggr:
     build:
-      context: ..
+      context: ../
       dockerfile: docker/Dockerfile.scraper
     container_name: chatos-scraper-aggr
     restart: unless-stopped
@@ -57,7 +55,7 @@ services:
 
   scraper-coinglass:
     build:
-      context: ..
+      context: ../
       dockerfile: docker/Dockerfile.scraper
     container_name: chatos-scraper-coinglass
     restart: unless-stopped
@@ -78,7 +76,7 @@ services:
 
   scraper-market:
     build:
-      context: ..
+      context: ../
       dockerfile: docker/Dockerfile.scraper
     container_name: chatos-scraper-market
     restart: unless-stopped
@@ -98,7 +96,7 @@ services:
 
   data-api:
     build:
-      context: ..
+      context: ../
       dockerfile: docker/Dockerfile.api
     container_name: chatos-data-api
     restart: unless-stopped

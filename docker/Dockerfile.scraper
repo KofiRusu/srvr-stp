@@ -6,11 +6,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY server-setup/requirements-scraper.txt .
+COPY requirements-scraper.txt ./
 RUN pip install --no-cache-dir -r requirements-scraper.txt
 
-COPY ChatOS-v2.2/scrapers/ ./scrapers/
-COPY server-setup/scripts/run_scraper.py .
+COPY scripts/run_scraper.py ./
 
 ENV PYTHONUNBUFFERED=1
 
