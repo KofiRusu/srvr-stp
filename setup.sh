@@ -81,8 +81,12 @@ echo -e "${GREEN}✓ Services started${NC}"
 echo -e "${CYAN}Waiting for services to be healthy...${NC}"
 sleep 10
 
-# Get server IP
-SERVER_IP=$(hostname -I 2>/dev/null | awk '{print $1}' || echo "localhost")
+# Run health check
+cd "$INSTALL_DIR"
+chmod +x health-check.sh
+echo ""
+echo -e "${CYAN}Running system validation...${NC}"
+bash health-check.sh || echo -e "${YELLOW}Note: Data collection may take a few minutes${NC}"
 
 echo ""
 echo -e "${GREEN}╔══════════════════════════════════════════════════════════╗${NC}"
@@ -93,20 +97,15 @@ echo -e "${CYAN}Services:${NC}"
 docker compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}" 2>/dev/null || docker compose ps
 echo ""
 echo -e "${CYAN}Endpoints:${NC}"
-echo -e "  Data API:   http://$SERVER_IP:8080"
-echo -e "  PostgreSQL: $SERVER_IP:5432"
-echo -e "  Redis:      $SERVER_IP:6379"
+echo -e "  Data API:   http://localhost:8080"
+echo -e "  PostgreSQL: localhost:5432"
+echo -e "  Redis:      localhost:6379"
 echo ""
 echo -e "${CYAN}Your API Key (save this for your Mac):${NC}"
 echo -e "  ${YELLOW}$(grep API_KEY "$INSTALL_DIR/.env" | cut -d= -f2)${NC}"
 echo ""
-echo -e "${CYAN}Mac Configuration:${NC}"
-echo -e "  export CHATOS_DATA_URL=\"http://$SERVER_IP:8080\""
-echo -e "  export CHATOS_API_KEY=\"$(grep API_KEY "$INSTALL_DIR/.env" | cut -d= -f2)\""
-echo ""
-echo -e "${CYAN}Management Commands:${NC}"
-echo -e "  cd $INSTALL_DIR/docker"
-echo -e "  docker compose logs -f      # View logs"
-echo -e "  docker compose restart      # Restart services"
-echo -e "  docker compose down         # Stop services"
+echo -e "${CYAN}Commands:${NC}"
+echo -e "  Health check:   bash $INSTALL_DIR/health-check.sh"
+echo -e "  View logs:      cd $INSTALL_DIR/docker && docker compose logs -f"
+echo -e "  Stop services:  cd $INSTALL_DIR/docker && docker compose down"
 echo ""

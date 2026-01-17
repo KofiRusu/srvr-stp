@@ -69,6 +69,26 @@ export CHATOS_DATA_URL="http://your-server-ip:8080"
 export CHATOS_API_KEY="your-api-key"
 ```
 
+## System Health Check
+
+After installation, validate everything is working:
+
+```bash
+bash ~/chatos-server/health-check.sh
+```
+
+This checks:
+- ✓ Docker daemon and Compose
+- ✓ All 5 services running (PostgreSQL, Redis, 3 Scrapers, API)
+- ✓ Database connectivity
+- ✓ API endpoints (health, authentication, endpoints)
+- ✓ Data pipelines (trades, funding, open interest)
+- ✓ WebSocket streaming
+- ✓ Storage and persistence
+- ✓ Database schema integrity
+
+**Output:** `SYSTEM HEALTHY` or detailed troubleshooting if issues found.
+
 ## Services
 
 | Service | Port | Description |
